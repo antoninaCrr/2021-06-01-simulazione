@@ -5,8 +5,10 @@
 package it.polito.tdp.genes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.genes.model.Adiacente;
 import it.polito.tdp.genes.model.Genes;
 import it.polito.tdp.genes.model.Model;
 import javafx.event.ActionEvent;
@@ -30,7 +32,7 @@ public class FXMLController {
     private Button btnCreaGrafo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGeni"
-    private ComboBox<?> cmbGeni; // Value injected by FXMLLoader
+    private ComboBox<Genes> cmbGeni; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnGeniAdiacenti"
     private Button btnGeniAdiacenti; // Value injected by FXMLLoader
@@ -46,13 +48,41 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	this.txtResult.clear();
+    	this.cmbGeni.getItems().clear();
     	
-
+    	model.creaGrafo();
+    	
+    	this.txtResult.appendText("GRAFO CREATO\n");
+    	this.txtResult.appendText("#VERTICI: "+this.model.getNVertici()+"\n");
+    	this.txtResult.appendText("#ARCHI: "+this.model.getNArchi()+"\n");
+    	
+    	this.cmbGeni.getItems().addAll(model.getVertici());
+    	
+    	 // Ri-abilita i bottoni
+        btnGeniAdiacenti.setDisable(false);
+        btnSimula.setDisable(false);
+        cmbGeni.setDisable(false);
+        txtIng.setDisable(false);
+    	
     }
 
     @FXML
     void doGeniAdiacenti(ActionEvent event) {
+    	this.txtResult.clear();
 
+    	Genes g = this.cmbGeni.getValue();
+    	if(g==null) {
+    		this.txtResult.appendText("Selezionare un gene\n");
+    		return;
+    	}
+    	
+    	List<Adiacente> vicini = model.getAdiacenze(g);
+        this.txtResult.appendText("Geni adiacenti a: "+g.getGeneId()+"\n");
+    	for(Adiacente ai : vicini) {
+    		this.txtResult.appendText(ai.toString()+"\n");
+    	}
+    	
     	
     }
 
@@ -74,6 +104,12 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	// Disabilita i bottoni
+    	btnGeniAdiacenti.setDisable(true);
+        btnSimula.setDisable(true);
+        cmbGeni.setDisable(true);
+        txtIng.setDisable(true);
     }
     
 }
